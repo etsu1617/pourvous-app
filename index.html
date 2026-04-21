@@ -124,6 +124,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
 .genre-item span{font-size:13px;color:#1a1a1a}
 .genre-del{background:none;border:none;color:#c0392b;font-size:13px;cursor:pointer;padding:2px 6px;border-radius:5px;font-family:inherit}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -140,6 +141,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
     <button class="nav-tab" onclick="showPage('graph',this)">グラフ</button>
     <button class="nav-tab" onclick="showPage('history',this)">履歴</button>
     <button class="nav-tab" onclick="showPage('settings',this)">設定</button>
+    <button class="nav-tab" onclick="showPage('qr',this)">QR</button>
   </div>
   <div id="page-inventory" class="page active">
     <div class="tab-bar" id="tab-bar"></div>
@@ -211,6 +213,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
     <div class="fg"><label>新しいジャンル名</label><input type="text" id="new-genre-name" placeholder="例：野菜"></div>
     <div class="modal-btns"><button class="mbtn cancel" onclick="closeGenreModal()">閉じる</button><button class="mbtn ok" onclick="addGenre()">追加</button></div>
     <div id="genre-list"></div>
+  </div>
+</div>
+<div id="page-qr" class="page">
+  <div class="body" style="display:flex;flex-direction:column;align-items:center;padding:40px 16px;gap:24px;">
+    <div style="font-size:15px;font-weight:600;color:#1a1a1a;">アプリのQRコード</div>
+    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+      <div id="qrcode"></div>
+    </div>
+    <div style="font-size:12px;color:#888;text-align:center;word-break:break-all;">https://etsu1617.github.io/pourvous-app/</div>
+    <div style="font-size:12px;color:#aaa;text-align:center;line-height:1.6;">このQRコードを読み取ると<br>在庫管理アプリが開きます</div>
   </div>
 </div>
 <script>
@@ -489,6 +501,30 @@ async function delGenre(g){
 document.getElementById('item-modal').addEventListener('click',function(e){if(e.target===this)closeItemModal();});
 document.getElementById('genre-modal').addEventListener('click',function(e){if(e.target===this)closeGenreModal();});
 loadAll();
+</script>
+<script>
+(function(){
+  let done = false;
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest && e.target.closest('button');
+    if(btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'qr'")){
+      setTimeout(function(){
+        if(!done){
+          const el = document.getElementById('qrcode');
+          if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
+            new QRCode(el, {
+              text: 'https://etsu1617.github.io/pourvous-app/',
+              width: 220, height: 220,
+              colorDark: '#1a1a1a', colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.H
+            });
+            done = true;
+          }
+        }
+      }, 200);
+    }
+  });
+})();
 </script>
 </body>
 </html>
