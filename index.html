@@ -504,30 +504,26 @@ loadAll();
 </script>
 <script>
 (function(){
-  let done = false;
-  function generateQR(){
-    if(!done){
-      const el = document.getElementById('qrcode');
-      if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
-        new QRCode(el, {
-          text: 'https://etsu1617.github.io/pourvous-app/',
-          width: 220, height: 220,
-          colorDark: '#1a1a1a', colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
-        });
-        done = true;
-      }
+  const _orig = window.showPage;
+  let qrDone = false;
+  window.showPage = function(page, btn){
+    if(typeof _orig === 'function') _orig(page, btn);
+    window.scrollTo(0,0);
+    if(page === 'qr' && !qrDone){
+      setTimeout(function(){
+        const el = document.getElementById('qrcode');
+        if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
+          new QRCode(el, {
+            text: 'https://etsu1617.github.io/pourvous-app/',
+            width: 220, height: 220,
+            colorDark: '#1a1a1a', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          qrDone = true;
+        }
+      }, 100);
     }
-    // スクロールをトップに戻す
-    window.scrollTo(0, 0);
-  }
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest && e.target.closest('button');
-    if(btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'qr'")){
-      setTimeout(generateQR, 200);
-    }
-  });
-})()
+  };
+})();
 </script>
 </body>
-</html>
