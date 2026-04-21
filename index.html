@@ -251,6 +251,28 @@ function showPage(name,el){
   if(name==='settings'){loadSettingsUI();}
 }
 
+// QRコード生成（showPageでqrが呼ばれたとき）
+let _qrDone = false;
+const _origShowPage = showPage;
+function showPage(name, el) {
+  _origShowPage(name, el);
+  window.scrollTo(0, 0);
+  if (name === 'qr' && !_qrDone) {
+    setTimeout(function() {
+      const qrEl = document.getElementById('qrcode');
+      if (qrEl && qrEl.innerHTML === '' && typeof QRCode !== 'undefined') {
+        new QRCode(qrEl, {
+          text: 'https://etsu1617.github.io/pourvous-app/',
+          width: 220, height: 220,
+          colorDark: '#1a1a1a', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        _qrDone = true;
+      }
+    }, 100);
+  }
+}
+
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function setSyncing(on){document.getElementById('sync-btn').classList.toggle('spinning',on);}
 
@@ -502,28 +524,5 @@ document.getElementById('item-modal').addEventListener('click',function(e){if(e.
 document.getElementById('genre-modal').addEventListener('click',function(e){if(e.target===this)closeGenreModal();});
 loadAll();
 </script>
-<script>
-(function(){
-  const _orig = window.showPage;
-  let qrDone = false;
-  window.showPage = function(page, btn){
-    if(typeof _orig === 'function') _orig(page, btn);
-    window.scrollTo(0,0);
-    if(page === 'qr' && !qrDone){
-      setTimeout(function(){
-        const el = document.getElementById('qrcode');
-        if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
-          new QRCode(el, {
-            text: 'https://etsu1617.github.io/pourvous-app/',
-            width: 220, height: 220,
-            colorDark: '#1a1a1a', colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-          });
-          qrDone = true;
-        }
-      }, 100);
-    }
-  };
-})();
-</script>
+
 </body>
