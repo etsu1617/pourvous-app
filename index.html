@@ -505,26 +505,29 @@ loadAll();
 <script>
 (function(){
   let done = false;
+  function generateQR(){
+    if(!done){
+      const el = document.getElementById('qrcode');
+      if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
+        new QRCode(el, {
+          text: 'https://etsu1617.github.io/pourvous-app/',
+          width: 220, height: 220,
+          colorDark: '#1a1a1a', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        done = true;
+      }
+    }
+    // スクロールをトップに戻す
+    window.scrollTo(0, 0);
+  }
   document.addEventListener('click', function(e){
     const btn = e.target.closest && e.target.closest('button');
     if(btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'qr'")){
-      setTimeout(function(){
-        if(!done){
-          const el = document.getElementById('qrcode');
-          if(el && el.innerHTML === '' && typeof QRCode !== 'undefined'){
-            new QRCode(el, {
-              text: 'https://etsu1617.github.io/pourvous-app/',
-              width: 220, height: 220,
-              colorDark: '#1a1a1a', colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.H
-            });
-            done = true;
-          }
-        }
-      }, 200);
+      setTimeout(generateQR, 200);
     }
   });
-})();
+})()
 </script>
 </body>
 </html>
