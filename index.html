@@ -212,6 +212,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
         <input type="text" id="itemUnit" placeholder="個">
       </div>
     </div>
+    <div class="form-group">
+      <label>単価（円）</label>
+      <input type="number" id="itemPrice" placeholder="0" min="0">
+    </div>
+    <div class="form-group">
+      <label>メモ・備考</label>
+      <input type="text" id="itemMemo" placeholder="メモを入力...">
+    </div>
     <div class="btn-row">
       <button class="btn cancel" onclick="closeModal('addModal')">キャンセル</button>
       <button class="btn save" onclick="saveItem()">保存</button>
@@ -347,6 +355,8 @@ function showAddModal() {
   document.getElementById('itemIcon').value = '';
   document.getElementById('itemQty').value = '0';
   document.getElementById('itemUnit').value = '';
+  document.getElementById('itemPrice').value = '0';
+  document.getElementById('itemMemo').value = '';
   populateGenreSelect();
   document.getElementById('addModal').style.display = 'flex';
 }
@@ -360,6 +370,8 @@ function showEditModal(id) {
   document.getElementById('itemIcon').value = item.icon || '';
   document.getElementById('itemQty').value = item.qty || 0;
   document.getElementById('itemUnit').value = item.unit || '';
+  document.getElementById('itemPrice').value = item.price || 0;
+  document.getElementById('itemMemo').value = item.memo || '';
   populateGenreSelect(item.genre);
   document.getElementById('addModal').style.display = 'flex';
 }
@@ -376,11 +388,11 @@ function saveItem() {
   if (editingId) {
     const item = items.find(i => i.id === editingId);
     const old = item.qty || 0;
-    Object.assign(item, { name, icon: document.getElementById('itemIcon').value, qty, unit: document.getElementById('itemUnit').value, genre: document.getElementById('itemGenre').value });
+    Object.assign(item, { name, icon: document.getElementById('itemIcon').value, qty, unit: document.getElementById('itemUnit').value, price: parseInt(document.getElementById('itemPrice').value)||0, memo: document.getElementById('itemMemo').value, genre: document.getElementById('itemGenre').value });
     if (old !== qty) addHistory(name, '更新', qty - old, qty);
     if (SUPABASE_URL && SUPABASE_KEY) updateSupabaseItem(item);
   } else {
-    const item = { id: Date.now().toString(), name, icon: document.getElementById('itemIcon').value, qty, unit: document.getElementById('itemUnit').value, genre: document.getElementById('itemGenre').value, created_at: new Date().toISOString() };
+    const item = { id: Date.now().toString(), name, icon: document.getElementById('itemIcon').value, qty, unit: document.getElementById('itemUnit').value, price: parseInt(document.getElementById('itemPrice').value)||0, memo: document.getElementById('itemMemo').value, genre: document.getElementById('itemGenre').value, created_at: new Date().toISOString() };
     items.push(item);
     addHistory(name, '追加', qty, qty);
     if (SUPABASE_URL && SUPABASE_KEY) insertSupabaseItem(item);
