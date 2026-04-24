@@ -135,9 +135,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
     <div class="items" id="items-list"><div class="loading">読み込み中...</div></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <!-- 品目追加モーダル -->
 <div class="modal-bg" id="item-modal">
   <div class="modal">
@@ -148,7 +146,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
       <div class="fg" style="margin-bottom:0"><label>初期在庫数</label><input type="number" id="new-stock" value="0" min="0"></div>
       <div class="fg" style="margin-bottom:0"><label>単位</label><select id="new-unit"><option>個</option><option>本</option><option>袋</option><option>箱</option><option>枚</option><option>冊</option><option>台</option><option>kg</option><option>g</option><option>L</option></select></div>
     </div>
-    <div class="fg" style="margin-top:12px"><label>単価（円）</label><input type="number" id="new-price" value="0" min="0"></div>
     <div class="fg"><label>メモ・備考</label><input type="text" id="new-memo" placeholder="任意"></div>
     <div class="modal-btns">
       <button class="mbtn cancel" onclick="closeItemModal()">キャンセル</button>
@@ -156,7 +153,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
     </div>
   </div>
 </div>
-
 <!-- ジャンル管理モーダル -->
 <div class="modal-bg" id="genre-modal">
   <div class="modal">
@@ -169,7 +165,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP'
     <div id="genre-list"></div>
   </div>
 </div>
-
 <!-- QRモーダル -->
 <div class="modal-bg" id="qr-modal">
   <div class="modal">
@@ -283,7 +278,6 @@ function renderItems(){
             <span class="metric-val" id="sv-${item.id}">${item.stock}</span>
             <span class="metric-unit">${item.unit||'個'}</span>
           </div>
-          ${item.price?'<div style="font-size:10px;color:#aaa;margin-top:2px">¥'+( item.price*item.stock).toLocaleString()+'</div>':''}
         </div>
         <div class="metric">
           <div class="metric-label">入荷数</div>
@@ -310,7 +304,6 @@ function renderItems(){
             <div class="ef"><label>ジャンル</label><select id="ge-${item.id}">${genres.filter(g=>g!=='すべて').map(g=>`<option${g===item.genre?' selected':''}>${g}</option>`).join('')}</select></div>
             <div class="ef"><label>在庫（直接修正）</label><input type="number" id="se-${item.id}" value="${item.stock}" min="0" style="width:90px"></div>
             <div class="ef"><label>単位</label><select id="ue-${item.id}"><option${(item.unit||'個')==='個'?' selected':''}>個</option><option${item.unit==='本'?' selected':''}>本</option><option${item.unit==='袋'?' selected':''}>袋</option><option${item.unit==='箱'?' selected':''}>箱</option><option${item.unit==='枚'?' selected':''}>枚</option><option${item.unit==='冊'?' selected':''}>冊</option><option${item.unit==='台'?' selected':''}>台</option><option${item.unit==='kg'?' selected':''}>kg</option><option${item.unit==='g'?' selected':''}>g</option><option${item.unit==='L'?' selected':''}>L</option></select></div>
-            <div class="ef"><label>単価（円）</label><input type="number" id="pe-${item.id}" value="${item.price||0}" min="0" style="width:90px"></div>
             <div class="ef"><label>メモ・備考</label><input type="text" id="me-${item.id}" value="${item.memo||''}" style="width:160px"></div>
           </div>
         </div>
@@ -351,7 +344,7 @@ async function saveEdit(id){
   const s=parseInt(document.getElementById(`se-${id}`).value)||0;
   const t=parseInt(document.getElementById(`th-${id}`).value)||0;
   const u=document.getElementById(`ue-${id}`).value;
-  const p=parseInt(document.getElementById(`pe-${id}`).value)||0;
+  const p=item.price||0;
   const m=document.getElementById(`me-${id}`).value.trim();
   if(!n)return;
   const patch={name:n,genre:g,stock:Math.max(0,s),threshold:Math.max(0,t),receipt:0,issue:0,unit:u,price:p,memo:m};
@@ -380,7 +373,7 @@ function chgI(id,d){const i=items.find(x=>x.id===id);if(d<0&&i.issue===0)return;
 function setI(id,v){const i=items.find(x=>x.id===id);const nv=Math.max(0,parseInt(v)||0);const diff=nv-i.issue;syncItem(id,{issue:nv,stock:Math.max(0,i.stock-diff)});}
 
 function populateSelect(){document.getElementById('new-genre').innerHTML=genres.filter(g=>g!=='すべて').map(g=>`<option>${g}</option>`).join('');}
-function openItemModal(){populateSelect();['new-name','new-memo'].forEach(id=>document.getElementById(id).value='');['new-stock','new-price'].forEach(id=>document.getElementById(id).value='0');document.getElementById('item-modal').classList.add('open');setTimeout(()=>document.getElementById('new-name').focus(),150);}
+function openItemModal(){populateSelect();['new-name','new-memo'].forEach(id=>document.getElementById(id).value='');document.getElementById('new-stock').value='0';document.getElementById('item-modal').classList.add('open');setTimeout(()=>document.getElementById('new-name').focus(),150);}
 function closeItemModal(){document.getElementById('item-modal').classList.remove('open');}
 
 async function addItem(){
@@ -388,7 +381,7 @@ async function addItem(){
   const genre=document.getElementById('new-genre').value;
   const stock=parseInt(document.getElementById('new-stock').value)||0;
   const unit=document.getElementById('new-unit').value;
-  const price=parseInt(document.getElementById('new-price').value)||0;
+  const price=0;
   const memo=document.getElementById('new-memo').value.trim();
   if(!name||!genre)return;
   try{
